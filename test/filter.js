@@ -3,7 +3,7 @@
 var fs = require("fs");
 var should = require("should");
 
-var SyncParser = require("../src/SyncParser");
+var SyncParser = require("../src/Parser");
 
 describe("filters", function() {
 

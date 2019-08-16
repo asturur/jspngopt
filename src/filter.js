@@ -34,7 +34,7 @@ function unfilter(img) {
   var bpp = img.bytePerPixel;
   var bpl = img.bytePerLine;
   var filtered = img.filtered;
-  var unfiltered = new Buffer(filtered.length);
+  var unfiltered = Buffer.alloc(filtered.length);
   unfiltered.fill(0);
   var x, y, n, w, nw;
   var filter = getFilter(filtered[0]);
@@ -79,7 +79,7 @@ function filterAll(img) {
   filtered[0] = unfiltered;
   var type;
   for (type = 1; type <= 5; ++type) {
-    filtered[type] = new Buffer(unfiltered.length);
+    filtered[type] = Buffer.alloc(unfiltered.length);
     for (var pos = 0; pos < unfiltered.length; pos += bpl)
       filtered[type][pos] = type;
   }

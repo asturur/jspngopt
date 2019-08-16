@@ -1,21 +1,11 @@
 "use strict";
 
-var zlib = require("zlib");
-
+var pako = require("pako");
 var Parameters = require("./Parameters");
-var SyncParser = require("./SyncParser");
+var Parser = require("./Parser");
 
 function Optimizer(options) {
   this.options = options = options || {};
-
-  if (options.pako) {
-    var pako = options.pako;
-    if (!options.deflateSync) {
-      options.deflateSync = function(buf) {
-        return Buffer(pako.deflate(new Uint8Array(buf))); // jshint ignore:line
-      };
-    }
-  }
 
   this.matrices = options.matrices || [{
     filter: [0, 5],
@@ -31,10 +21,18 @@ function Optimizer(options) {
   this.reportSuffix = options.fileName ? " " + options.fileName : "";
 }
 
-var signature = new Buffer([137, 80, 78, 71, 13, 10, 26, 10]);
+var signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+Optimizer.prototype.deflateSync = function(buf) {
+  return Buffer.from(pako.deflate(new Uint8Array(buf))); // jshint ignore:line
+};
+
+Optimizer.prototype.base64String = function(base64) {
+  return this.bufferSync(Buffer.from(base64, 'base64')).toString('base64');
+}
 
 Optimizer.prototype.bufferSync = function(buf) {
-  var parser = new SyncParser(this.options);
+  var parser = new Parser(this.options);
   var img = parser.parse(buf);
   img.unfilter();
   img = img.opaque().grayScale();
@@ -63,8 +61,7 @@ Optimizer.prototype.compressSync = function(param) {
     strategy: param.strategy,
   };
   var data = this.img.refiltered[param.filter];
-  var deflate = this.options.deflateSync || zlib.deflateSync;
-  var compressed = deflate(data, opts);
+  var compressed = this.deflateSync(data, opts);
   this.reportOne(param, this.img, this.img.filtered.length, compressed.length);
   if (compressed.length < this.minSize) {
     this.minSize = compressed.length;
@@ -104,7 +101,7 @@ Optimizer.prototype.buildPNG = function() {
 };
 
 Optimizer.prototype.buildIDAT = function(data) {
-  var chunk = new Buffer(data.length + 12);
+  var chunk = Buffer.alloc(data.length + 12);
   data.copy(chunk, 8);
   return this.img.completeChunk("IDAT", chunk);
 };

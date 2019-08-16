@@ -1,5 +1,5 @@
 "use strict";
 
-var Optimizer = require("./OptimizerFS");
+var Optimizer = require("./Optimizer");
 
 module.exports.Optimizer = Optimizer;

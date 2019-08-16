@@ -1,7 +1,6 @@
 "use strict";
 
 var crc32 = require("buffer-crc32");
-
 var filter = require("./filter");
 
 function Image(hdr, chunks, filtered) {
@@ -43,7 +42,7 @@ Image.prototype.grayScale = function() {
     }
   }
   var bppg = bpp - 2, bplg = bppg * w + 1;
-  var gray = new Buffer(bplg * h);
+  var gray = Buffer.alloc(bplg * h);
   i = 0;
   j = 0;
   for (y = 0; y < h; ++y) {
@@ -86,7 +85,7 @@ Image.prototype.opaque = function() {
     ++i; // filter type byte
   }
   var bppo = bpp - 1, bplo = bppo * w + 1;
-  var opaq = new Buffer(bplo * h);
+  var opaq = Buffer.alloc(bplo * h);
   i = 0;
   j = 0;
   for (y = 0; y < h; ++y) {
@@ -115,7 +114,7 @@ Image.prototype.opaque = function() {
 };
 
 Image.prototype.recreateIHDR = function() {
-  var chunk = new Buffer(12 + 13);
+  var chunk = Buffer.alloc(12 + 13);
   chunk.writeUInt32BE(this.hdr.width, 8);
   chunk.writeUInt32BE(this.hdr.height, 12);
   chunk.writeUInt8(this.hdr.bitDepth, 16);

@@ -31,6 +31,7 @@
     "should": "^11.1.2"
   },
   "dependencies": {
+    "buffer": "^5.2.1",
     "buffer-crc32": "^0.2.5"
   },
   "bin": {
